@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Mappa</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/leaflet.css" />
+    <!--[if lte IE 8]><link rel="stylesheet" href="css/leaflet.ie.css" /><![endif]-->
+    <link href='http://fonts.googleapis.com/css?family=Roboto' rel='stylesheet' type='text/css'>
+    <style>
+        #mapMap {
+            position: absolute;
+            left: 0px;
+            top: 135px;
+            height: 600px;
+            width: 495px;
+        }
+        #mapContainer {
+            width: 930px;
+            height: 770px;
+            position: relative;
+            font-family: 'Roboto', sans-serif;
+        }
+        #mapDescription {
+            position: absolute;
+            right: 0px;
+            top: 125px;
+            width: 430px;
+            height: 600px;
+        }
+        #mapDescription p {
+            margin: 8px;
+            padding: 0px;
+        }
+        #mapDescription input, textarea {
+            border: 1px solid #CCCCCC;
+            margin: 0px;
+            padding: 0px;
+        }
+        #mapTitle p, h1{
+            margin: 5px;
+            margin-left: 183px;
+        }
+        #mapTitle img {
+            height: 130px;
+            width: 183px;
+            position: absolute;
+        }
+        #mapFooter {
+            position: absolute;
+            bottom: 5px;
+            right: 5px;
+        }
+        #mapConferma {
+            height: 40px;
+            width: 130px;
+            border-radius: 10px 10px;
+            font-size: 1.5em;
+        }
+    </style>
+</head>
+<body>
+    <div id="mapContainer">
+        <div id="mapTitle">
+            <img src="img/tenda.jpg">
+            <h1>Mappa delle basi Scout delle Marche</h1>
+            <p>Questa è una mappa collaborativa. Ci serve il TUO contributo per mantenerla aggiornata.</p>
+            <p>Puoi modificare i dati di un campo esistente cliccando sull'icona ed aggiornando i campi a destra.</p>
+            <p>Puoi anche <a href="#" id="mapButtonInsert"> inserire una nuova base</a>, se questa non esiste già.</p>
+        </div>
+        <div id="mapMap"></div>
+        <div id="mapDescription">
+            <input type="hidden" name="place_id" value="">
+            <p>
+                Nome
+                <input name="name" type="text" style="width: 360px;" required="required">
+            </p>
+            <p>
+                Latitudine
+                <input name="lat" type="text" style="width: 116px;" readonly="readonly">
+                Longitudine
+                <input name="lng" type="text" style="width: 118px;" readonly="readonly">
+            </p>
+            <p>
+                Città
+                <input name="city" type="text" style="width: 110px;" required="required">
+                Indirizzo
+                <input name="address" type="text" style="width: 187px;" required="required">
+            </p>
+            <p>
+                Nome del referente
+                <input name="referent" type="text" style="width: 269px;">
+            </p>
+            <p>
+                Tel
+                <input name="tel" type="text" style="width: 90px;">
+                Sito
+                <input name="web" type="text" style="width: 90px;">
+                Email
+                <input name="email" type="text" style="width: 115px;">
+            </p>
+            <p>
+                Posti letto
+                <input name="beds" type="text" style="width: 30px;">
+                Quota
+                <input name="fee" type="text" style="width: 128px;">
+            </p>
+            <p>
+                Bagni in muratura
+                <input name="wc" type="checkbox">
+                Acqua potabile
+                <input name="water" type="checkbox">
+                Corrente
+                <input name="electricity" type="checkbox">
+            </p>
+            <p>
+                Consigli per gli acquisti<br />
+                <textarea name="shopadvices" style="height: 60px; width: 409px;"></textarea>
+            </p>
+            <p>
+                Note <br />
+                <textarea name="notes" style="height: 100px; width: 409px;"></textarea>
+            </p>
+            <!-- reCAPTCHA -->
+            <!-- IMPORTANT: YOU MUST INSERT YOUR OWN PUBLIC KEY! -->
+            <script type="text/javascript" src="http://www.google.com/recaptcha/api/challenge?k=HEREYOURPUBLICKEY"></script>
+            <noscript>
+             <iframe src="http://www.google.com/recaptcha/api/noscript?k=HEREYOURPUBLICKEY"
+                 height="300" width="500" frameborder="0"></iframe><br>
+             <textarea name="recaptcha_challenge_field" rows="3" cols="40">
+             </textarea>
+             <input type="hidden" name="recaptcha_response_field"
+                 value="manual_challenge">
+            </noscript>
+            <input id="mapConferma" type="button" onClick="sendData();"  value="Conferma"/>
+        </div>
+        <div id="mapFooter">
+            Ideato e realizzato da <a href="http://tapion.it">Riccardo Serafini</a> | <a href="https://github.com/tapione/findacamp">Free Software - AGPL License</a> | <a href="campi.php?action=list">Download RAW Data</a>
+        </div>
+    </div>
+    <script src="js/leaflet.js"></script>
+    <script src="js/jquery.min.js"></script>
+    <script>
+
+        // function triggered when send button is pressed
+        function sendData(){
+            // prepare data to send
+            place_id = $('#mapDescription input[name="place_id"]').val();
+            name = $('#mapDescription input[name="name"]').val();
+            lat = $('#mapDescription input[name="lat"]').val();
+            lng = $('#mapDescription input[name="lng"]').val();
+            city = $('#mapDescription input[name="city"]').val();
+            address = $('#mapDescription input[name="address"]').val();
+            referent = $('#mapDescription input[name="referent"]').val();
+            tel = $('#mapDescription input[name="tel"]').val();
+            web = $('#mapDescription input[name="web"]').val();
+            email = $('#mapDescription input[name="email"]').val();
+            beds = $('#mapDescription input[name="beds"]').val();
+            fee = $('#mapDescription input[name="fee"]').val();
+            wc = $('#mapDescription input[name="wc"]').prop('checked');
+            water = $('#mapDescription input[name="water"]').prop('checked');
+            electricity = $('#mapDescription input[name="electricity"]').prop('checked');
+            shopadvices = $('#mapDescription textarea[name="shopadvices"]').val();
+            notes = $('#mapDescription textarea[name="notes"]').val();
+
+            recaptcha_challenge_field = $('#mapDescription input[name="recaptcha_challenge_field"]').val(); 
+            recaptcha_response_field = $('#mapDescription input[name="recaptcha_response_field"]').val();
+
+            // 2 different kind of action: new or edit
+            if(clickedNew)
+                url = 'campi.php?action=new';
+            else
+                url = 'campi.php?action=edit';
+
+            // POST data to the server
+            $.ajax({
+                type: 'POST',
+                url: url, 
+                data: {
+                    place_id: place_id,
+                    name: name,
+                    lat: lat,
+                    lng: lng,
+                    city: city,
+                    address: address,
+                    referent: referent,
+                    tel: tel,
+                    web: web,
+                    email: email,
+                    beds: beds,
+                    fee: fee,
+                    wc: wc,
+                    water: water,
+                    electricity: electricity,
+                    shopadvices: shopadvices,
+                    notes: notes,
+                    recaptcha_challenge_field: recaptcha_challenge_field,
+                    recaptcha_response_field: recaptcha_response_field
+                },
+                error: function(a,b,c){
+                    console.log('Data submission failed');
+                    console.log(b);
+                    console.log(c);
+                },
+                success: function(data, textStatus, jqXHR){
+                    if(data['error'] == true) {
+                        console.log(data);
+                        if(data['code'] == 2)
+                            alert("Hai sbagliato il CAPTCHA, riprova.");
+                        if(data['code'] == 4)
+                            alert("Devi ricopiare le due parole che vedi nell'immagine.");
+                        return false;
+                    }
+                    // reload the page
+                    window.location.reload();
+                }
+            });
+
+        }
+
+        function clearForm(){
+           // clear form
+           $('#mapDescription input[type="text"]').val("");
+           $('#mapDescription textarea[name="shopadvices"]').val("");
+           $('#mapDescription textarea[name="notes"]').val("");
+           $('#mapDescription input[type="checkbox"]').removeAttr('checked');
+        }
+
+        var clickedNew = false;
+        var places;
+        var mapCenter = new L.LatLng(43.38309377382831, 13.261871337890625);
+        var map;
+        var iconPlaces = [];
+        var newIcon;
+
+        var icon = L.icon({
+            iconUrl: 'img/icon.png'
+        });
+        
+        var newIconImage = L.icon({
+            iconUrl: 'img/iconNew.png'
+        });
+    
+        $(document).ready(function(){
+            clearForm();
+           // load places from the server
+           $.ajax({
+                dataType: 'json',
+                url: 'campi.php?action=list', 
+                error: function(jqXHR, textStatus, error){
+                    console.log("Errore caricamento JSON");
+                    console.log(textStatus);
+                    console.log(error);
+                },
+                success: function(data){
+                    places = data;
+                    
+                    // init map
+                    map = L.map('mapMap').setView(mapCenter, 9);
+                    L.tileLayer('http://{s}.tile.cloudmade.com/BC9A493B41014CAABB98F0471D759707/997/256/{z}/{x}/{y}.png', {
+                        maxZoom: 18,
+                        attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://cloudmade.com">CloudMade</a>'
+                    }).addTo(map);
+
+                    // draw markers in the map
+                    for(i in places) {
+                        place = places[i];
+                        iconPlaces[i] = L.marker([place['lat'], place['lng']], {icon: icon})
+                        .bindPopup(place['name'])
+                        .addTo(map);
+
+                        iconPlaces[i].id = i;
+                        
+                        // associate each marker with a click event
+                        iconPlaces[i].on('click', function(e){
+                            id_local = e.target.id;
+                            id_global = places[id_local];
+                            $('#mapDescription input[name="place_id"]').val(id_global);
+                            place = places[id_local];
+                            for(i in place){
+                               $('input[name="'+i+'"]').val(place[i]);
+                            }
+                            for(i in a=Array('wc', 'water', 'electricity')) {
+                                if(place[a[i]] == 'true')
+                                    $('input[name="'+a[i]+'"]').attr('checked', 'checked');
+                                else
+                                    $('input[name="'+a[i]+'"]').removeAttr('checked', '');
+                            }
+                            for(i in a=Array('shopadvices', 'notes')){
+                                $('textarea[name="'+a[i]+'"]').val(place[a[i]]);
+                            }
+                        });
+                    }
+               }});
+
+            // function triggered when user want to insert new place
+            $('#mapButtonInsert').click(function(){
+                if(clickedNew) return;
+                clickedNew = true;
+                clearForm();
+                // draw new icon
+                newIcon = L.marker(mapCenter, {icon: newIconImage, draggable: true});
+                newIcon.bindPopup("<p>Trascinami sul luogo del campo che vuoi inserire.<br />Fai zoom e posizionami precisamente, poi compila i dati a destra.</p>")
+                       .addTo(map);
+                newIcon.openPopup();
+                map.setView(mapCenter, 9);
+                newIcon.on('dragend', function(e){
+                    newLat = String(newIcon.getLatLng()['lat']);
+                    newLng = String(newIcon.getLatLng()['lng'])
+                    // insert lat long in the form
+                    $('input[name="lat"]').val(newLat);
+                    $('input[name="lng"]').val(newLng);
+                    $('input[name="city"]').val("caricamento...");
+                    $('input[name="address"]').val("caricamento...");
+                    query = "http://nominatim.openstreetmap.org/reverse?format=json&lat="+newLat+"&lon="+newLng+"&zoom=18&addressdetails=1";
+                    // ask nomatim for the address
+                    $.ajax({
+                        url: query,
+                        dataType: 'json',
+                        error: function(a,b,c){
+                            console.log('Geocode failed');
+                            console.log(b);
+                            console.log(c);
+                        },
+                        success: function(d) {
+                            city = d['address']['city'];
+                            road = d['address']['road'];
+                            if(road == undefined) road = 'Strada sconosciuta';
+                            newCoord = '<p>Lat: '+newLat+'<br />Long: '+newLng+'<br />'+city+', '+road+'</p>';
+                            newIcon.bindPopup(newCoord);
+                            newIcon.openPopup();
+                            // update city and address in the form
+                            $('input[name="city"]').val(city);
+                            $('input[name="address"]').val(road);
+                        }
+                    });
+                });
+            });
+        });
+    </script>
+</body>
+</html>
+

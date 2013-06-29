@@ -1,4 +1,4 @@
 findacamp
 =========
 
-La mappa dei campi scout delle Marche
+Mappa dei campi Scout nelle Marche
