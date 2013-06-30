@@ -235,10 +235,16 @@
 
         var icon = L.icon({
             iconUrl: 'img/icon.png'
+            iconSize: [32, 37],
+            iconAnchor: [16, 37],
+            popupAnchor: [0, -37]
         });
         
         var newIconImage = L.icon({
-            iconUrl: 'img/iconNew.png'
+            iconUrl: 'img/iconNew.png',
+            iconSize: [32, 37],
+            iconAnchor: [16, 37],
+            popupAnchor: [0, -37]
         });
     
         $(document).ready(function(){
