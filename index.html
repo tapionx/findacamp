@@ -93,17 +93,17 @@
             </p>
             <p>
                 Tel
-                <input name="tel" type="text" style="width: 90px;">
-                Sito
-                <input name="web" type="text" style="width: 90px;">
+                <input name="tel" type="text" style="width: 140px;">
                 Email
-                <input name="email" type="text" style="width: 115px;">
+                <input name="email" type="text" style="width: 193px;">
             </p>
             <p>
                 Posti letto
                 <input name="beds" type="text" style="width: 30px;">
                 Quota
-                <input name="fee" type="text" style="width: 128px;">
+                <input name="fee" type="text" style="width: 40px;">
+                Sito
+                <input name="web" type="text" style="width: 166px;">
             </p>
             <p>
                 Bagni in muratura
@@ -123,9 +123,9 @@
             </p>
             <!-- reCAPTCHA -->
             <!-- IMPORTANT: YOU MUST INSERT YOUR OWN PUBLIC KEY! -->
-            <script type="text/javascript" src="http://www.google.com/recaptcha/api/challenge?k=HEREYOURPUBLICKEY"></script>
+            <script type="text/javascript" src="http://www.google.com/recaptcha/api/challenge?k=PUBLICKEY"></script>
             <noscript>
-             <iframe src="http://www.google.com/recaptcha/api/noscript?k=HEREYOURPUBLICKEY"
+             <iframe src="http://www.google.com/recaptcha/api/noscript?k=PUBLICKEY"
                  height="300" width="500" frameborder="0"></iframe><br>
              <textarea name="recaptcha_challenge_field" rows="3" cols="40">
              </textarea>
@@ -234,7 +234,7 @@
         var newIcon;
 
         var icon = L.icon({
-            iconUrl: 'img/icon.png'
+            iconUrl: 'img/icon.png',
             iconSize: [32, 37],
             iconAnchor: [16, 37],
             popupAnchor: [0, -37]
@@ -288,9 +288,9 @@
                             }
                             for(i in a=Array('wc', 'water', 'electricity')) {
                                 if(place[a[i]] == 'true')
-                                    $('input[name="'+a[i]+'"]').attr('checked', 'checked');
+                                    $('input[name="'+a[i]+'"]').prop('checked', true);
                                 else
-                                    $('input[name="'+a[i]+'"]').removeAttr('checked', '');
+                                    $('input[name="'+a[i]+'"]').prop('checked', false);
                             }
                             for(i in a=Array('shopadvices', 'notes')){
                                 $('textarea[name="'+a[i]+'"]').val(place[a[i]]);
