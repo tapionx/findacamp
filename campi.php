@@ -20,7 +20,7 @@ if($action == 'list') {
     // load database
     require_once('db.php');
     header("Content-type: application/json; charset=utf-8;");
-    $data = query("SELECT * FROM place;");
+    $data = query("SELECT * FROM place GROUP BY place_id ORDER BY submission_date DESC;");
     $data = json_encode($data);
     echo $data;
 }
