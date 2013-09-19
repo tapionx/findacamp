@@ -11,22 +11,23 @@
         #mapMap {
             position: absolute;
             left: 0px;
-            top: 135px;
+            top: 110px;
             height: 600px;
             width: 495px;
         }
         #mapContainer {
             width: 930px;
-            height: 770px;
+            height: 745px;
             position: relative;
             font-family: 'Roboto', sans-serif;
         }
         #mapDescription {
             position: absolute;
             right: 0px;
-            top: 125px;
+            top: 105px;
             width: 430px;
             height: 600px;
+            display: none;
         }
         #mapDescription p {
             margin: 8px;
@@ -45,6 +46,7 @@
             height: 130px;
             width: 183px;
             position: absolute;
+            top: -20px;
         }
         #mapFooter {
             position: absolute;
@@ -63,10 +65,9 @@
     <div id="mapContainer">
         <div id="mapTitle">
             <img src="img/tenda.jpg">
-            <h1>Mappa delle basi Scout delle Marche</h1>
-            <p>Questa è una mappa collaborativa. Ci serve il TUO contributo per mantenerla aggiornata.</p>
-            <p>Puoi modificare i dati di un campo esistente cliccando sull'icona ed aggiornando i campi a destra.</p>
-            <p>Puoi anche <a href="#" id="mapButtonInsert"> inserire una nuova base</a>, se questa non esiste già.</p>
+            <h1>Case e terreni per campi Scout nelle Marche</h1>
+            <p>Questa mappa è collaborativa, abbiamo bisogno del tuo contributo per mantenerla aggiornata.</p>
+            <p>Fai click su un'icona per visualizzare i dettagli e modificarli, oppure <a href="#" id="mapButtonInsert"> inserisci una nuova base</a>.</p>
         </div>
         <div id="mapMap"></div>
         <div id="mapDescription">
@@ -279,6 +280,7 @@
                         
                         // associate each marker with a click event
                         iconPlaces[i].on('click', function(e){
+                            $('#mapDescription').fadeIn();
                             id_local = e.target.id;
                             id_global = places[id_local];
                             $('#mapDescription input[name="place_id"]').val(id_global);
@@ -302,6 +304,7 @@
             // function triggered when user want to insert new place
             $('#mapButtonInsert').click(function(){
                 if(clickedNew) return;
+                $('#mapDescription').fadeIn();
                 clickedNew = true;
                 clearForm();
                 // draw new icon
